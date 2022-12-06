@@ -96,3 +96,4 @@ jobs:
         file: ./Dockerfile
         context: ./
         tags: ${{ env.REGISTRY_NAME }}/${{ github.repository_owner }}/ci-example:latest
+        push: true
