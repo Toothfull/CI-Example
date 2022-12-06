@@ -39,11 +39,11 @@ jobs:
       - name: Run Tests
         run: npm test
       
-      - name: Upload Coverage
+      - name: Upload Code
         uses: actions/upload-artifact@v3
         with:
           name: TypeScript CI Example
-          paths: |
+          path: |
             ./emit
             package.json
 
