@@ -1,5 +1,5 @@
-# Start the image using ubuntu 22.04
-FROM ubuntu:22.04
+# Start the image using Node 18
+FROM node:18
 
 # Create a new folder for our node.js project and switch to it
 RUN mkdir /app
