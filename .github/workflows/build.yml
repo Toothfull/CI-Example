@@ -1,0 +1,50 @@
+name: TypeScript CI Example
+
+on: 
+  push:
+    paths:
+      - 'source/**'
+      - '.eslintrc.json'
+      - 'tsconfig.json'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/build.yml'
+    branches:
+      - '**'
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+    steps:
+      - name: Clone repo
+        uses: action/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with: 
+          node-version: 18
+      
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Lint using ESlint
+        run: npx eslint ./source/
+
+      - name: Compile TypesScript
+        run: npx tsc
+
+      - name: Run Tests
+        run: npm test
+      
+      - name: Upload Coverage
+        uses: actions/upload-artifact@v3
+        with:
+          name: TypeScript CI Example
+          paths: |
+            ./emit
+            package.json
+
+
