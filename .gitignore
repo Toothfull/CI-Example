@@ -1,0 +1,5 @@
+#TypeScript
+emit/
+
+#Node.js packages
+node_modules/
