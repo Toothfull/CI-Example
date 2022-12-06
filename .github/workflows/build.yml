@@ -9,6 +9,7 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/build.yml'
+      - 'Dockerfile'
     branches:
       - '**'
 
@@ -46,5 +47,52 @@ jobs:
           path: |
             ./emit
             package.json
+ 
+  docker:
+    name: Docker
+    runs-on: ubuntu-22.04
+    needs: build
+    permissions:
+      contents: read
+      packages: write
+    env:
+      REGISTRY_NAME: ghcr.io
+    steps: 
+    - name: Clone repository
+      uses: actions/checkout@v3
 
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+      
+    - name: Setup Docker
+      uses: docker/setup-build-actions@v2
+      with:
+        platform: linux/amd64
 
+    - name: Login to Docker
+      uses: docker/login-action@v2
+      with:
+        registry: ${{ env.REGISTRY_NAME }}
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Install Dependencies
+      run: npm install
+
+    - name: Lint using ESlint
+      run: npx eslint ./source/
+
+    - name: Compile TypesScript
+      run: npx tsc
+
+    - name: Run Tests
+      run: npm test
+          
+    - name: Build Docker Image
+      uses: docker/build-push-actions@v3
+      with:
+        file: ./Dockerfile
+        context: ./
+        tags: ${{ env.REGISTRY_NAME }}/${{ github.repository_owner }}/ci-example:latest
