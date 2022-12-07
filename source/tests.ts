@@ -1,6 +1,5 @@
 import chai from 'chai'
 import chiahttp from 'chai-http'
-import { assert } from 'console'
 import { expressApp, httpServer } from './main'
 
 chai.use(chiahttp)

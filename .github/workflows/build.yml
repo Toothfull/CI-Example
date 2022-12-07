@@ -95,7 +95,7 @@ jobs:
         push: true
       
     - name: Cleanup Docker Images
-      uses: snok/container-retention-policy@1
+      uses: snok/container-retention-policy@v1
       with:
         image-names: ci-example
         cut-off: 0 secconds ago UTC
