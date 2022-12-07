@@ -98,7 +98,7 @@ jobs:
       uses: snok/container-retention-policy@v1
       with:
         image-names: ci-example
-        cut-off: 0 secconds ago UTC
+        cut-off: 0 seconds ago UTC
         keep-at-least: 1
         untagged-only: true
         account-type: personal
