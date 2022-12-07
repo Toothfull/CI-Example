@@ -13,6 +13,9 @@ on:
     branches:
       - '**'
 
+env: 
+  ARTIFACT_NAME: TypeScript-CI-Example
+
 jobs:
   build:
     name: Build
@@ -43,10 +46,11 @@ jobs:
       - name: Upload Code
         uses: actions/upload-artifact@v3
         with:
-          name: TypeScript CI Example
+          name: ${{ env.ARTIFACT_NAME }}
           path: |
             ./emit
             package.json
+            package-lock.json
  
   docker:
     name: Docker
@@ -58,13 +62,15 @@ jobs:
     env:
       REGISTRY_NAME: ghcr.io
     steps: 
-    - name: Clone repository
+    - name: Clone repo
       uses: actions/checkout@v3
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
+
+    - name: Download Code
+      uses: actions/download-artifact@v3
       with:
-        node-version: 18
+        name: ${{ env.ARTIFACT_NAME }}
+        path: ./code/
       
     - name: Setup Docker
       uses: docker/setup-buildx-action@v2
@@ -78,22 +84,21 @@ jobs:
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
     
-    - name: Install Dependencies
-      run: npm install
-
-    - name: Lint using ESlint
-      run: npx eslint ./source/
-
-    - name: Compile TypesScript
-      run: npx tsc
-
-    - name: Run Tests
-      run: npm test
+      
           
     - name: Build Docker Image
       uses: docker/build-push-action@v3
       with:
         file: ./Dockerfile
-        context: ./
+        context: ./code/
         tags: ${{ env.REGISTRY_NAME }}/${{ github.repository_owner }}/ci-example:latest
         push: true
+      
+    - name: Cleanup Docker Images
+      uses: snok/container-retention-policy@1
+      with:
+        image-names: ci-example
+        cut-off: 0 secconds ago UTC
+        keep-at-least: 1
+        untagged-only: personal
+        token: ${{ secrets.PERSONAL_ACCESS_TOKEN_PACKAGES }}
